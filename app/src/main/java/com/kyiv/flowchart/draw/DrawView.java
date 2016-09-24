@@ -1,6 +1,7 @@
 package com.kyiv.flowchart.draw;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,22 +11,37 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.kyiv.flowchart.MainActivity;
+import com.kyiv.flowchart.R;
 import com.kyiv.flowchart.block.Block;
+import com.kyiv.flowchart.block.EditBlock;
+import com.kyiv.flowchart.block.Rectangle;
+import com.kyiv.flowchart.block.Rhomb;
+import com.kyiv.flowchart.block.RoundRect;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class DrawView extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener {
 
     private Context context;
     private DrawThread drawThread;
-
+    private Block touchBlock;
     private List<Block> blockList;
-
+    public static Block editBlock;
+    private Block removeBlock;
 
     public void drawView(Canvas canvas) {
         Paint p = new Paint();
-        for (Block block : blockList) {
+        Iterator iterator = blockList.iterator();
+        while(iterator.hasNext()) {
+            Block block = (Block) iterator.next();
+            if (block != null && block == removeBlock){
+                iterator.remove();
+                removeBlock = null;
+                continue;
+            }
             p.setColor(block.getColor());
             switch(block.getBlockType()) {
                 case ROUNDRECT:
@@ -45,7 +61,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
             }
             p.setColor(Color.RED);
             p.setTextAlign(Paint.Align.CENTER);
-            p.setTextSize(20);
+            p.setTextSize(block.getTextSize());
             canvas.drawText(block.getText(), block.getX(), block.getY(), p);
         }
     }
@@ -105,16 +121,47 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
     public boolean onTouch(View view, MotionEvent motionEvent) {
         float x;
         float y;
-        Block block = findBlock(motionEvent.getX(), motionEvent.getY());
 
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 x = motionEvent.getX();
                 y = motionEvent.getY();
-                //block = findBlock(x, y);
+                switch (MainActivity.ACTION){
+                    case ADDRECT:
+                        Rectangle rectangle = new Rectangle((int)x, (int)y, getResources().getColor(R.color.block_color), "", 20);
+                        addBlock(rectangle);
+                        MainActivity.ACTION = MainActivity.Action.MOVE;
+
+                        editBlock(rectangle);
+                        break;
+                    case ADDRHOMB:
+                        Rhomb rhomb = new Rhomb((int)x, (int)y, getResources().getColor(R.color.block_color), "", 20);
+                        addBlock(rhomb);
+                        MainActivity.ACTION = MainActivity.Action.MOVE;
+
+                        editBlock(rhomb);
+                        break;
+                    case ADDROUNDRECT:
+                        RoundRect roundRect = new RoundRect((int) x, (int) y, getResources().getColor(R.color.block_color), "", 20);
+                        addBlock(roundRect);
+                        MainActivity.ACTION = MainActivity.Action.MOVE;
+
+                        editBlock(roundRect);
+                        break;
+                    case DELETE:
+                        removeBlock = findBlock(x, y);
+                        MainActivity.ACTION = MainActivity.Action.MOVE;
+                        break;
+                    case EDIT:
+                        editBlock(findBlock(x, y));
+                        break;
+                    case MOVE:
+                        touchBlock = findBlock(x, y);
+                        break;
+                }
                 return true;
             case MotionEvent.ACTION_UP:
-                //block = null;
+                touchBlock = null;
                 return true;
             case MotionEvent.ACTION_POINTER_DOWN:
                 return true;
@@ -122,12 +169,21 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
                 return true;
             case MotionEvent.ACTION_HOVER_MOVE:
             case MotionEvent.ACTION_MOVE:
-                if (block != null){
-                    block.setX((int)motionEvent.getX());
-                    block.setY((int)motionEvent.getY());
+                if (touchBlock != null){
+                    touchBlock.setX((int)motionEvent.getX());
+                    touchBlock.setY((int)motionEvent.getY());
                 }
                 return true;
         }
         return false;
+    }
+
+    public void editBlock(Block block){
+        if (block != null) {
+            editBlock = block;
+            Intent intent = new Intent(getContext(), EditBlock.class);
+            getContext().startActivity(intent);
+            MainActivity.ACTION = MainActivity.Action.MOVE;
+        }
     }
 }

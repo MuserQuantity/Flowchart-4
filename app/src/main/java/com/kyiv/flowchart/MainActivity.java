@@ -1,8 +1,8 @@
 package com.kyiv.flowchart;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -13,6 +13,10 @@ import com.kyiv.flowchart.draw.DrawView;
 
 public class MainActivity extends Activity {
 
+    public enum Action{
+        ADDRECT, ADDROUNDRECT, ADDRHOMB, DELETE, EDIT, MOVE
+    }
+    public static Action ACTION = Action.MOVE;
     private DrawView drawView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,11 +27,31 @@ public class MainActivity extends Activity {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         frameLayout.addView(drawView, layoutParams);
 
-        Rectangle rectangle = new Rectangle(100, 100, 100, 100, Color.CYAN, "x += 1");
+        Rectangle rectangle = new Rectangle(100, 100, getResources().getColor(R.color.block_color), "x += 1", 20);
         drawView.addBlock(rectangle);
-        Rhomb rhomb = new Rhomb(300, 300, 100, 100, Color.YELLOW, "x >= 0");
+        Rhomb rhomb = new Rhomb(300, 300, getResources().getColor(R.color.block_color), "x >= 0", 20);
         drawView.addBlock(rhomb);
-        RoundRect roundRect = new RoundRect(200, 100, 100, 50, Color.YELLOW, "x >= 0");
+        RoundRect roundRect = new RoundRect(200, 100, getResources().getColor(R.color.block_color), "x >= 0", 20);
         drawView.addBlock(roundRect);
+    }
+
+    public void addRect(View view){
+        ACTION = Action.ADDRECT;
+    }
+
+    public void addRoundRect(View view){
+        ACTION = Action.ADDROUNDRECT;
+    }
+
+    public void addRhomb(View view){
+        ACTION = Action.ADDRHOMB;
+    }
+
+    public void editBlock(View view){
+        ACTION = Action.EDIT;
+    }
+
+    public void deleteBlock(View view){
+        ACTION = Action.DELETE;
     }
 }

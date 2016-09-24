@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rhomb extends Block {
-    public Rhomb(int X, int Y, int width, int height, int color, String text) {
-        super(X, Y, width, height, BlockType.RHOMB, color, text);
+    public Rhomb(int X, int Y, int width, int height, int color, String text, int textSize) {
+        super(X, Y, width, height, BlockType.RHOMB, color, text, textSize);
+    }
+
+    public Rhomb(int X, int Y, int color, String text, int textSize) {
+        super(X, Y, 100, 100, BlockType.RHOMB, color, text, textSize);
     }
 
     @Override

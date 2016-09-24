@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rectangle extends Block {
-    public Rectangle(int X, int Y, int width, int height, int color, String text) {
-        super(X, Y, width, height, BlockType.RECT, color, text);
+    public Rectangle(int X, int Y, int width, int height, int color, String text, int textSize) {
+        super(X, Y, width, height, BlockType.RECT, color, text, textSize);
+    }
+
+    public Rectangle(int X, int Y, int color, String text, int textSize){
+        super(X, Y, 100, 100, BlockType.RECT, color, text, textSize);
     }
 
     @Override

@@ -10,8 +10,9 @@ public abstract class Block {
     private BlockType blockType;
     private int color;
     private String text;
+    private int textSize;
 
-      Block(int X, int Y, int width, int height, BlockType blockType, int color, String text){
+    Block(int X, int Y, int width, int height, BlockType blockType, int color, String text, int textSize){
         this.X = X;
         this.Y = Y;
         this.width = width;
@@ -19,6 +20,15 @@ public abstract class Block {
         this.blockType = blockType;
         this.color = color;
         this.text = text;
+        this.textSize = textSize;
+    }
+
+    public int getTextSize(){
+        return textSize;
+    }
+
+    public void setTextSize(int textSize){
+        this.textSize = textSize;
     }
 
     public abstract Point getInPoint();
@@ -34,6 +44,10 @@ public abstract class Block {
 
     public String getText(){
         return text;
+    }
+
+    public void setText(String text){
+        this.text = text;
     }
 
     public int getWidth() {

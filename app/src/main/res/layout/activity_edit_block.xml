@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="5dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp"
+    tools:context="com.kyiv.flowchart.MainActivity">
+
+    <com.kyiv.flowchart.layout.MyFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/frameL"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editSV"
+        android:minHeight="200dp"
+        android:layout_below = "@id/frameL">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/relativeLayout">
+
+            <TextView
+                android:text="@string/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvText"
+                android:layout_centerHorizontal="true"
+                android:textSize="25sp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvText"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/etText" />
+
+            <TextView
+                android:text="@string/textSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvTextSize"
+                android:textSize="25sp"
+                android:layout_below="@+id/etText" />
+
+            <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:id="@+id/numberPicker"
+                android:orientation="vertical"
+                android:layout_below="@id/etText"
+                android:layout_toEndOf="@+id/tvTextSize" />
+        </RelativeLayout>
+    </ScrollView>
+    <Button
+        android:text="@string/save"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/editSV"
+        android:onClick="Save"/>
+</RelativeLayout>
