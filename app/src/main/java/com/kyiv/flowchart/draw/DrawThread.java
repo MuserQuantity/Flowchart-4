@@ -1,21 +1,26 @@
-package com.kyiv.flowchart;
+package com.kyiv.flowchart.draw;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
-public class DrawThread extends Thread {
+import com.kyiv.flowchart.R;
+
+
+ class DrawThread extends Thread {
 
     private boolean running = false;
     private SurfaceHolder surfaceHolder;
     private Context context;
+    private DrawView drawView;
 
-    public DrawThread(SurfaceHolder surfaceHolder, Context context) {
+     DrawThread(SurfaceHolder surfaceHolder, Context context, DrawView drawView) {
         this.surfaceHolder = surfaceHolder;
         this.context = context;
+        this.drawView = drawView;
     }
 
-    public void setRunning(boolean running) {
+     void setRunning(boolean running) {
         this.running = running;
     }
 
@@ -29,6 +34,7 @@ public class DrawThread extends Thread {
                 if (canvas == null)
                     continue;
                 canvas.drawColor(context.getResources().getColor(R.color.bg_surface));
+                drawView.drawView(canvas);
             } finally {
                 if (canvas != null) {
                     surfaceHolder.unlockCanvasAndPost(canvas);

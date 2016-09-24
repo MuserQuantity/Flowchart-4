@@ -1,0 +1,70 @@
+package com.kyiv.flowchart.block;
+
+import java.util.List;
+
+public abstract class Block {
+    private int width;
+    private int height;
+    private int X;
+    private int Y;
+    private BlockType blockType;
+    private int color;
+    private String text;
+
+      Block(int X, int Y, int width, int height, BlockType blockType, int color, String text){
+        this.X = X;
+        this.Y = Y;
+        this.width = width;
+        this.height = height;
+        this.blockType = blockType;
+        this.color = color;
+        this.text = text;
+    }
+
+    public abstract Point getInPoint();
+    public abstract List<Point> getOutPoints();
+
+    public BlockType getBlockType(){
+        return blockType;
+    }
+
+    public int getColor(){
+        return color;
+    }
+
+    public String getText(){
+        return text;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getX() {
+        return X;
+    }
+
+    public void setX(int x) {
+        X = x;
+    }
+
+    public int getY() {
+        return Y;
+    }
+
+    public void setY(int y) {
+        Y = y;
+    }
+}
