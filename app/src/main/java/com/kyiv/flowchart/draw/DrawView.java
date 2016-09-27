@@ -14,7 +14,9 @@ import android.view.View;
 import com.kyiv.flowchart.MainActivity;
 import com.kyiv.flowchart.R;
 import com.kyiv.flowchart.block.Block;
+import com.kyiv.flowchart.block.Point;
 import com.kyiv.flowchart.block.EditBlock;
+import com.kyiv.flowchart.block.Link;
 import com.kyiv.flowchart.block.Rectangle;
 import com.kyiv.flowchart.block.Rhomb;
 import com.kyiv.flowchart.block.RoundRect;
@@ -29,8 +31,12 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
     private DrawThread drawThread;
     private Block touchBlock;
     private List<Block> blockList;
+    private List<Link> linkList;
     public static Block editBlock;
     private Block removeBlock;
+    private String hint = "";
+    private Link newLink = null;
+    private String[] listOutPoints;
 
     public void drawView(Canvas canvas) {
         Paint p = new Paint();
@@ -63,7 +69,36 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
             p.setTextAlign(Paint.Align.CENTER);
             p.setTextSize(block.getTextSize());
             canvas.drawText(block.getText(), block.getX(), block.getY(), p);
+
+            p.setTextAlign(Paint.Align.LEFT);
+            p.setTextSize(50);
+            canvas.drawText(hint, 50, 50, p);
         }
+
+        iterator = linkList.iterator();
+        p.setColor(getResources().getColor(R.color.block_color));
+        while (iterator.hasNext()){
+            Link link = (Link) iterator.next();
+            Point inPoint = link.getInPoint();
+            Point outPoint = link.getOutPoint();
+            if (inPoint.getX() != outPoint.getX()){
+                canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), outPoint.getY() + 10, p);
+                canvas.drawLine(outPoint.getX(), outPoint.getY()+10, inPoint.getX(), outPoint.getY() + 10, p);
+                canvas.drawLine(inPoint.getX(), outPoint.getY() + 10, inPoint.getX(), inPoint.getY(), p);
+            }
+        }
+    }
+
+    public void showHint(String hint){
+        this.hint = hint;
+    }
+
+    public void hideHint(){
+        hint = "";
+    }
+
+    public boolean isHint(){
+        return hint.equals("");
     }
 
     public DrawView(Context context) {
@@ -71,6 +106,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
         this.context = context;
         getHolder().addCallback(this);
         blockList = new ArrayList<>();
+        linkList = new ArrayList<>();
         setOnTouchListener(this);
     }
 
@@ -158,6 +194,32 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
                     case MOVE:
                         touchBlock = findBlock(x, y);
                         break;
+                    case ADDLINK:
+                        if (newLink == null){
+                            Block block = findBlock(x, y);
+                            if (block != null) {
+                                newLink = new Link();
+                                newLink.setOutBlock(block);
+                                if (block.getNumberOfOutPoint() == 1) {
+                                    newLink.setOutIndex(0);
+                                }
+                                else{
+                                    listOutPoints = new String[block.getNumberOfOutPoint()];
+                                    for (int i = 0; i < listOutPoints.length; i++)
+                                        listOutPoints[i] = "" + i;
+                                    ((MainActivity) context).startDialog(listOutPoints, MainActivity.DIALOG_OUT_POINT);
+                                }
+                            }
+                        }else{
+                            Block block = findBlock(x, y);
+                            if (block != null){
+                                newLink.setInBlock(block);
+                                linkList.add(newLink);
+                                newLink = null;
+                                MainActivity.ACTION = MainActivity.Action.MOVE;
+                            }
+                        }
+                        break;
                 }
                 return true;
             case MotionEvent.ACTION_UP:
@@ -185,5 +247,9 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
             getContext().startActivity(intent);
             MainActivity.ACTION = MainActivity.Action.MOVE;
         }
+    }
+
+    public void setLinkOutIndex(int index){
+        newLink.setOutIndex(index);
     }
 }

@@ -1,7 +1,5 @@
 package com.kyiv.flowchart.block;
 
-import java.util.List;
-
 public abstract class Block {
     private int width;
     private int height;
@@ -27,12 +25,13 @@ public abstract class Block {
         return textSize;
     }
 
-    public void setTextSize(int textSize){
+    void setTextSize(int textSize){
         this.textSize = textSize;
     }
 
     public abstract Point getInPoint();
-    public abstract List<Point> getOutPoints();
+    public abstract Point getOutPoint(int i);
+    public abstract int getNumberOfOutPoint();
 
     public BlockType getBlockType(){
         return blockType;

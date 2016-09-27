@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rectangle extends Block {
+    private int numberOfOutPoints = 1;
     public Rectangle(int X, int Y, int width, int height, int color, String text, int textSize) {
         super(X, Y, width, height, BlockType.RECT, color, text, textSize);
     }
@@ -18,9 +19,14 @@ public class Rectangle extends Block {
     }
 
     @Override
-    public List<Point> getOutPoints() {
-        List<Point> out = new ArrayList<>();
-        out.add(new Point(getX(), getY() + getHeight()/2));
-        return out;
+    public Point getOutPoint(int i) {
+        if (i == 0)
+            return new Point(getX(), getY() + getHeight()/2);
+        return null;
+    }
+
+    @Override
+    public int getNumberOfOutPoint() {
+        return numberOfOutPoints;
     }
 }

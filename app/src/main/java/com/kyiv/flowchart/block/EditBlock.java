@@ -17,13 +17,14 @@ public class EditBlock extends AppCompatActivity implements TextWatcher, NumberP
     private NumberPicker numberPicker;
     private EditText editText;
     private Block block = null;
+    DrawView drawView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_block);
         MyFrameLayout frame = (MyFrameLayout) findViewById(R.id.frameL);
         frame.setMaxHeight(300);
-        DrawView drawView = new DrawView(this);
+        drawView = new DrawView(this);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         frame.addView(drawView, layoutParams);
 
