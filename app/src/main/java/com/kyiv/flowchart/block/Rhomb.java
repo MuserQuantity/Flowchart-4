@@ -15,7 +15,7 @@ public class Rhomb extends Block {
 
     @Override
     public Point getInPoint(){
-        return new Point(getX(), getY() - getHeight()/2);
+        return new Point(getX(), (int)(getY() - getHeight()*Math.pow(2, 0.5)/2));
     }
 
     @Override

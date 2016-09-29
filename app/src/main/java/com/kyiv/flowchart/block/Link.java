@@ -2,7 +2,7 @@ package com.kyiv.flowchart.block;
 
 public class Link {
     private Block out;
-    private int outIndex;
+    private int outIndex = -1;
     private Block in;
 
     public void setOutBlock(Block out){
@@ -21,8 +21,13 @@ public class Link {
         return out;
     }
 
+    public int getOutIndex() {
+        return outIndex;
+    }
+
     public Block getInBlock(){
         return in;
+
     }
 
     public Point getOutPoint(){

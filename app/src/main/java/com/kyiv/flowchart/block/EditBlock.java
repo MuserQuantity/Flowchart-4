@@ -17,30 +17,30 @@ public class EditBlock extends AppCompatActivity implements TextWatcher, NumberP
     private NumberPicker numberPicker;
     private EditText editText;
     private Block block = null;
-    DrawView drawView;
+    //DrawView drawView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_block);
-        MyFrameLayout frame = (MyFrameLayout) findViewById(R.id.frameL);
-        frame.setMaxHeight(300);
-        drawView = new DrawView(this);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        frame.addView(drawView, layoutParams);
+        //MyFrameLayout frame = (MyFrameLayout) findViewById(R.id.frameL);
+        //frame.setMaxHeight(300);
+        //drawView = new DrawView(this);
+        //FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        //frame.addView(drawView, layoutParams);
 
 
         switch(DrawView.editBlock.getBlockType()){
             case RECT:
-                block = new Rectangle(frame.getWidth()/2, frame.getHeight()/2, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
+                block = new Rectangle(0, 0, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
                 break;
             case RHOMB:
-                block = new Rhomb(frame.getWidth()/2, frame.getHeight()/2, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
+                block = new Rhomb(0, 0, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
                 break;
             case ROUNDRECT:
-                block = new RoundRect(frame.getWidth()/2, frame.getHeight()/2, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
+                block = new RoundRect(0, 0, DrawView.editBlock.getColor(), DrawView.editBlock.getText(), DrawView.editBlock.getTextSize());
                 break;
         }
-        drawView.addBlock(block);
+        //drawView.addBlock(block);
         editText = (EditText) findViewById(R.id.etText);
         editText.setText(block.getText());
         editText.addTextChangedListener(this);

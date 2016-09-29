@@ -14,6 +14,8 @@ import android.view.View;
 import com.kyiv.flowchart.MainActivity;
 import com.kyiv.flowchart.R;
 import com.kyiv.flowchart.block.Block;
+import com.kyiv.flowchart.block.BlockType;
+import com.kyiv.flowchart.block.Model;
 import com.kyiv.flowchart.block.Point;
 import com.kyiv.flowchart.block.EditBlock;
 import com.kyiv.flowchart.block.Link;
@@ -30,24 +32,146 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
     private Context context;
     private DrawThread drawThread;
     private Block touchBlock;
-    private List<Block> blockList;
-    private List<Link> linkList;
     public static Block editBlock;
     private Block removeBlock;
     private String hint = "";
     private Link newLink = null;
     private String[] listOutPoints;
+    private Model model;
+
+    public DrawView(Context context) {
+        super(context);
+        this.context = context;
+        getHolder().addCallback(this);
+        model = new Model();
+        setOnTouchListener(this);
+    }
+
+    public void removeBlock(Block removeBlock){
+        if (removeBlock == null)
+            return;
+        model.removeBlockAndLinks(removeBlock);
+        this.removeBlock = null;
+    }
+
+
+
+    public void drawLink(Block in, Point inPoint, Block out, Point outPoint, int outIndex, Canvas canvas){
+        Paint p = new Paint();
+        p.setColor(getResources().getColor(R.color.block_color));
+        if (outPoint.getY() > inPoint.getY()) {
+            if (out.getBlockType() != BlockType.RHOMB) {
+                canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), outPoint.getY() + 10, p);
+                if (outPoint.getX() <= inPoint.getX()) {
+                    if (outPoint.getX() + out.getWidth() / 2 > inPoint.getX() - in.getWidth() / 2) {
+                        canvas.drawLine(outPoint.getX(), outPoint.getY() + 10, outPoint.getX() + out.getWidth() / 2 + 10, outPoint.getY() + 10, p);
+                        canvas.drawLine(outPoint.getX() + out.getWidth() / 2 + 10, outPoint.getY() + 10, outPoint.getX() + out.getWidth() / 2 + 10, inPoint.getY() + in.getHeight() + 10, p);
+                        canvas.drawLine(outPoint.getX() + out.getWidth() / 2 + 10, inPoint.getY() + in.getHeight() + 10, inPoint.getX() - in.getWidth() / 2 - 10, inPoint.getY() + in.getHeight() + 10, p);
+                        canvas.drawLine(inPoint.getX() - in.getWidth() / 2 - 10, inPoint.getY() + in.getHeight() + 10, inPoint.getX() - in.getWidth() / 2 - 10, inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX() - in.getWidth() / 2 - 10, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    } else {
+                        canvas.drawLine(outPoint.getX(), outPoint.getY() + 10, (outPoint.getX() + out.getWidth() / 2 + inPoint.getX() - in.getWidth() / 2) / 2, outPoint.getY() + 10, p);
+                        canvas.drawLine((outPoint.getX() + out.getWidth() / 2 + inPoint.getX() - in.getWidth() / 2) / 2, outPoint.getY() + 10, (outPoint.getX() + out.getWidth() / 2 + inPoint.getX() - in.getWidth() / 2) / 2, inPoint.getY() - 10, p);
+                        canvas.drawLine((outPoint.getX() + out.getWidth() / 2 + inPoint.getX() - in.getWidth() / 2) / 2, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                } else {
+                    if (outPoint.getX() - out.getWidth() / 2 < inPoint.getX() + in.getWidth() / 2) {
+                        canvas.drawLine(outPoint.getX(), outPoint.getY() + 10, outPoint.getX() - out.getWidth() / 2 - 10, outPoint.getY() + 10, p);
+                        canvas.drawLine(outPoint.getX() - out.getWidth() / 2 - 10, outPoint.getY() + 10, outPoint.getX() - out.getWidth() / 2 - 10, inPoint.getY() + in.getHeight() + 10, p);
+                        canvas.drawLine(outPoint.getX() - out.getWidth() / 2 - 10, inPoint.getY() + in.getHeight() + 10, inPoint.getX() + in.getWidth() / 2 + 10, inPoint.getY() + in.getHeight() + 10, p);
+                        canvas.drawLine(inPoint.getX() + in.getWidth() / 2 + 10, inPoint.getY() + in.getHeight() + 10, inPoint.getX() + in.getWidth() / 2 + 10, inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX() + in.getWidth() / 2 + 10, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    } else {
+                        canvas.drawLine(outPoint.getX(), outPoint.getY() + 10, (outPoint.getX() - out.getWidth() / 2 + inPoint.getX() + in.getWidth() / 2) / 2, outPoint.getY() + 10, p);
+                        canvas.drawLine((outPoint.getX() - out.getWidth() / 2 + inPoint.getX() + in.getWidth() / 2) / 2, outPoint.getY() + 10, (outPoint.getX() - out.getWidth() / 2 + inPoint.getX() + in.getWidth() / 2) / 2, inPoint.getY() - 10, p);
+                        canvas.drawLine((outPoint.getX() - out.getWidth() / 2 + inPoint.getX() + in.getWidth() / 2) / 2, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                }
+            } else {
+                if (outIndex == 0){
+                    if (outPoint.getX() > inPoint.getX() + in.getWidth()/2){
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), (outPoint.getX() + inPoint.getX() + in.getWidth()/2)/2, outPoint.getY(), p);
+                        canvas.drawLine((outPoint.getX() + inPoint.getX() + in.getWidth()/2)/2, outPoint.getY(), (outPoint.getX() + inPoint.getX() + in.getWidth()/2)/2, inPoint.getY() - 10, p);
+                        canvas.drawLine((outPoint.getX() + inPoint.getX() + in.getWidth()/2)/2, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                    else {
+                        int leftX = Math.min(inPoint.getX() - in.getWidth()/2 - 10, outPoint.getX() - 10);
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), leftX, outPoint.getY(), p);
+                        canvas.drawLine(leftX, outPoint.getY(), leftX, inPoint.getY() - 10, p);
+                        canvas.drawLine(leftX, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                } else {
+                    if (outPoint.getX() < inPoint.getX() - in.getWidth()/2){
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), (outPoint.getX() + inPoint.getX() - in.getWidth()/2)/2, outPoint.getY(), p);
+                        canvas.drawLine((outPoint.getX() + inPoint.getX() - in.getWidth()/2)/2, outPoint.getY(), (outPoint.getX() + inPoint.getX() - in.getWidth()/2)/2, inPoint.getY() - 10, p);
+                        canvas.drawLine((outPoint.getX() + inPoint.getX() - in.getWidth()/2)/2, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                    else {
+                        int rightX = Math.max(inPoint.getX() + in.getWidth()/2 + 10, outPoint.getX() + 10);
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), rightX, outPoint.getY(), p);
+                        canvas.drawLine(rightX, outPoint.getY(), rightX, inPoint.getY() - 10, p);
+                        canvas.drawLine(rightX, inPoint.getY() - 10, inPoint.getX(), inPoint.getY() - 10, p);
+                        canvas.drawLine(inPoint.getX(), inPoint.getY() - 10, inPoint.getX(), inPoint.getY(), p);
+                    }
+                }
+            }
+        }
+        else{
+            if (out.getBlockType() == BlockType.RHOMB){
+                if (outIndex == 0){
+                    if (outPoint.getX() >= inPoint.getX()){
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), inPoint.getX(), outPoint.getY(), p);
+                        canvas.drawLine(inPoint.getX(), outPoint.getY(), inPoint.getX(), inPoint.getY(), p);
+                    }
+                    else{
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, p);
+                        canvas.drawLine(outPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, inPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, p);
+                        canvas.drawLine(inPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, inPoint.getX(), inPoint.getY(), p);
+                    }
+                }
+                else{
+                    if (outPoint.getX() < inPoint.getX()){
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), inPoint.getX(), outPoint.getY(), p);
+                        canvas.drawLine(inPoint.getX(), outPoint.getY(), inPoint.getX(), inPoint.getY(), p);
+                    }
+                    else{
+                        canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, p);
+                        canvas.drawLine(outPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, inPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, p);
+                        canvas.drawLine(inPoint.getX(), (float)(outPoint.getY() + out.getWidth()/Math.pow(2, 0.5) + inPoint.getY())/2, inPoint.getX(), inPoint.getY(), p);
+                    }
+                }
+            }
+            else {
+                canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), outPoint.getY() + 10, p);
+                canvas.drawLine(outPoint.getX(), outPoint.getY() + 10, inPoint.getX(), outPoint.getY() + 10, p);
+                canvas.drawLine(inPoint.getX(), outPoint.getY() + 10, inPoint.getX(), inPoint.getY(), p);
+            }
+        }
+    }
 
     public void drawView(Canvas canvas) {
         Paint p = new Paint();
-        Iterator iterator = blockList.iterator();
-        while(iterator.hasNext()) {
-            Block block = (Block) iterator.next();
-            if (block != null && block == removeBlock){
-                iterator.remove();
-                removeBlock = null;
-                continue;
-            }
+        if (removeBlock != null){
+            removeBlock(removeBlock);
+        }
+
+        p.setColor(getResources().getColor(R.color.block_color));
+        List<Link> linkList = model.getLinkList();
+        for (int index = 0; index < linkList.size(); index++){
+            Link link = linkList.get(index);
+            drawLink(link.getInBlock(), link.getInPoint(), link.getOutBlock(), link.getOutPoint(), link.getOutIndex(), canvas);
+        }
+
+        List<Block> blockList = model.getBlockList();
+        for (int index = 0; index < blockList.size(); index++) {
+            Block block = blockList.get(index);
             p.setColor(block.getColor());
             switch(block.getBlockType()) {
                 case ROUNDRECT:
@@ -74,19 +198,6 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
             p.setTextSize(50);
             canvas.drawText(hint, 50, 50, p);
         }
-
-        iterator = linkList.iterator();
-        p.setColor(getResources().getColor(R.color.block_color));
-        while (iterator.hasNext()){
-            Link link = (Link) iterator.next();
-            Point inPoint = link.getInPoint();
-            Point outPoint = link.getOutPoint();
-            if (inPoint.getX() != outPoint.getX()){
-                canvas.drawLine(outPoint.getX(), outPoint.getY(), outPoint.getX(), outPoint.getY() + 10, p);
-                canvas.drawLine(outPoint.getX(), outPoint.getY()+10, inPoint.getX(), outPoint.getY() + 10, p);
-                canvas.drawLine(inPoint.getX(), outPoint.getY() + 10, inPoint.getX(), inPoint.getY(), p);
-            }
-        }
     }
 
     public void showHint(String hint){
@@ -99,23 +210,6 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
 
     public boolean isHint(){
         return hint.equals("");
-    }
-
-    public DrawView(Context context) {
-        super(context);
-        this.context = context;
-        getHolder().addCallback(this);
-        blockList = new ArrayList<>();
-        linkList = new ArrayList<>();
-        setOnTouchListener(this);
-    }
-
-    public List<Block> getBlocks(){
-        return blockList;
-    }
-
-    public void addBlock(Block block){
-        blockList.add(block);
     }
 
     @Override
@@ -144,14 +238,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
         }
     }
 
-    public Block findBlock(float x, float y){
-        for (int index = 0; index < blockList.size(); index++){
-            Block block = blockList.get(index);
-            if (x >= block.getX() - block.getWidth()/2 && x <= block.getX() + block.getWidth()/2 && y >= block.getY() - block.getHeight()/2 && y <= block.getY() + block.getHeight()/2)
-                return block;
-        }
-        return null;
-    }
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -165,39 +252,40 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
                 switch (MainActivity.ACTION){
                     case ADDRECT:
                         Rectangle rectangle = new Rectangle((int)x, (int)y, getResources().getColor(R.color.block_color), "", 20);
-                        addBlock(rectangle);
+                        model.addBlock(rectangle);
                         MainActivity.ACTION = MainActivity.Action.MOVE;
 
                         editBlock(rectangle);
                         break;
                     case ADDRHOMB:
                         Rhomb rhomb = new Rhomb((int)x, (int)y, getResources().getColor(R.color.block_color), "", 20);
-                        addBlock(rhomb);
+                        model.addBlock(rhomb);
                         MainActivity.ACTION = MainActivity.Action.MOVE;
 
                         editBlock(rhomb);
                         break;
                     case ADDROUNDRECT:
                         RoundRect roundRect = new RoundRect((int) x, (int) y, getResources().getColor(R.color.block_color), "", 20);
-                        addBlock(roundRect);
+                        model.addBlock(roundRect);
                         MainActivity.ACTION = MainActivity.Action.MOVE;
 
                         editBlock(roundRect);
                         break;
                     case DELETE:
-                        removeBlock = findBlock(x, y);
+                        removeBlock = model.findBlock(x, y);
                         MainActivity.ACTION = MainActivity.Action.MOVE;
                         break;
                     case EDIT:
-                        editBlock(findBlock(x, y));
+                        editBlock(model.findBlock(x, y));
                         break;
                     case MOVE:
-                        touchBlock = findBlock(x, y);
+                        touchBlock = model.findBlock(x, y);
                         break;
                     case ADDLINK:
                         if (newLink == null){
-                            Block block = findBlock(x, y);
+                            Block block = model.findBlock(x, y);
                             if (block != null) {
+                                showHint("Виберіть елемент 2");
                                 newLink = new Link();
                                 newLink.setOutBlock(block);
                                 if (block.getNumberOfOutPoint() == 1) {
@@ -211,10 +299,11 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
                                 }
                             }
                         }else{
-                            Block block = findBlock(x, y);
+                            Block block = model.findBlock(x, y);
+                            hideHint();
                             if (block != null){
                                 newLink.setInBlock(block);
-                                linkList.add(newLink);
+                                model.addLink(newLink);
                                 newLink = null;
                                 MainActivity.ACTION = MainActivity.Action.MOVE;
                             }
@@ -251,5 +340,10 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
 
     public void setLinkOutIndex(int index){
         newLink.setOutIndex(index);
+    }
+
+    public void deleteNewLink(){
+        newLink = null;
+        hideHint();
     }
 }
