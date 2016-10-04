@@ -15,6 +15,23 @@ public abstract class Block {
     private static int lastId = -1;
     private int id;
 
+    public abstract Point getInPoint();
+    public abstract Point getOutPoint(int i);
+    public abstract int getNumberOfOutPoint();
+    public abstract boolean setLinkedInBlock(Block block);
+    public abstract boolean setLinkedOutBlock(int i, Block block);
+    public abstract void removeLinkedBlock(Block block);
+    List<Block> linkedInBlocks;
+    HashMap<Integer, Block> linkedOutBlocks;
+
+    public BlockType getBlockType(){
+        return blockType;
+    }
+
+    public static void clear(){
+        lastId = -1;
+    }
+
     Block(int X, int Y, int width, int height, BlockType blockType, int color, String text, int textSize){
         this.X = X;
         this.Y = Y;
@@ -28,6 +45,25 @@ public abstract class Block {
         id = lastId;
     }
 
+    Block(int X, int Y, int width, int height, BlockType blockType, int color, String text, int textSize, int id){
+        this.X = X;
+        this.Y = Y;
+        this.width = width;
+        this.height = height;
+        this.blockType = blockType;
+        this.color = color;
+        this.text = text;
+        this.textSize = textSize;
+        if (id > lastId) {
+            this.id = id;
+            lastId = id;
+        }
+        else {
+            lastId++;
+            id = lastId;
+        }
+    }
+
     public int getId(){
         return id;
     }
@@ -39,18 +75,6 @@ public abstract class Block {
     void setTextSize(int textSize){
         this.textSize = textSize;
     }
-
-    public abstract Point getInPoint();
-    public abstract Point getOutPoint(int i);
-    public abstract int getNumberOfOutPoint();
-    public abstract boolean setLinkedInBlock(Block block);
-    public abstract boolean setLinkedOutBlock(int i, Block block);
-    public abstract void removeLinkedBlock(Block block);
-    public BlockType getBlockType(){
-        return blockType;
-    }
-    protected List<Block> linkedInBlocks;
-    protected HashMap<Integer, Block> linkedOutBlocks;
 
     public List<Block> getLinkedInBlocks(){
         return linkedInBlocks;

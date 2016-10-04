@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -17,12 +16,12 @@ import android.widget.ListView;
 import com.kyiv.flowchart.block.Model;
 import com.kyiv.flowchart.draw.DrawView;
 
-import java.io.BufferedReader;
-import java.io.File;
+import org.xml.sax.SAXException;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public class MainActivity extends Activity {
@@ -37,6 +36,7 @@ public class MainActivity extends Activity {
     private String[] listOutPoints;
     private boolean isSaved = false;
     private String fileName;
+    private static final int OPENFILE = 1;
     private Model model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,19 @@ public class MainActivity extends Activity {
 
     public void open(View view){
         Intent intent = new Intent(this, OpenFileActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, OPENFILE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent){
+        switch (requestCode){
+            case OPENFILE:
+                if (resultCode == RESULT_OK){
+                    fileName = intent.getStringExtra("url");
+                    readFile(fileName);
+                }
+                break;
+        }
     }
 
     public void save(View view){
@@ -84,9 +96,9 @@ public class MainActivity extends Activity {
     }
 
     void writeFile(String fileName){
-        ModelToXML modelToXML = new ModelToXML(model);
+        ModelXML modelToXML = new ModelXML(this);
         try {
-            modelToXML.writeXML(fileName);
+            modelToXML.writeXML(model, fileName);
         } catch (TransformerException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -140,7 +152,6 @@ public class MainActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         writeFile(getFilesDir()+"/" + etFileName.getText().toString());
-                        readFile(etFileName.getText().toString());
                     }
                 });
                 adb.setNegativeButton("Не зберігати", null);
@@ -150,17 +161,15 @@ public class MainActivity extends Activity {
     }
 
     void readFile(String fileName) {
+        ModelXML modelXML = new ModelXML(this);
         try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(fileName)));
-            File s= getFilesDir();
-            String str = "";
-            // читаем содержимое
-            while ((str = br.readLine()) != null) {
-                Log.d("sssssssssssss", str);
-            }
+            model = modelXML.readXML(new FileInputStream(fileName));
+            drawView.setModel(model);
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();

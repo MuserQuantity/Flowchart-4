@@ -47,6 +47,10 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
         setOnTouchListener(this);
     }
 
+    public void setModel(Model model){
+        this.model = model;
+    }
+
     public void removeBlock(Block removeBlock){
         if (removeBlock == null)
             return;

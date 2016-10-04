@@ -55,7 +55,7 @@ public class OpenFileActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
-                intent.putExtra("url", path + ArrayFiles.get((int)id));
+                intent.putExtra("url", path + "/" + ArrayFiles.get((int)id));
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }

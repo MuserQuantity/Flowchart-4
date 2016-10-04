@@ -3,18 +3,18 @@ package com.kyiv.flowchart.block;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 public class Rhomb extends Block {
     private int numberOfOutPoints = 2;
-    public Rhomb(int X, int Y, int width, int height, int color, String text, int textSize) {
-        super(X, Y, width, height, BlockType.RHOMB, color, text, textSize);
+
+    public Rhomb(int X, int Y, int color, String text, int textSize) {
+        super(X, Y, 100, 100, BlockType.RHOMB, color, text, textSize);
         linkedInBlocks = new ArrayList<>();
         linkedOutBlocks = new HashMap<Integer, Block>();
     }
 
-    public Rhomb(int X, int Y, int color, String text, int textSize) {
-        super(X, Y, 100, 100, BlockType.RHOMB, color, text, textSize);
+    public Rhomb(int X, int Y, int color, String text, int textSize, int id) {
+        super(X, Y, 100, 100, BlockType.RHOMB, color, text, textSize, id);
         linkedInBlocks = new ArrayList<>();
         linkedOutBlocks = new HashMap<Integer, Block>();
     }

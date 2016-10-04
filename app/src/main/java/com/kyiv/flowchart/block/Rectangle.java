@@ -3,19 +3,19 @@ package com.kyiv.flowchart.block;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 public class Rectangle extends Block {
 
     private int numberOfOutPoints = 1;
-    public Rectangle(int X, int Y, int width, int height, int color, String text, int textSize) {
-        super(X, Y, width, height, BlockType.RECT, color, text, textSize);
+
+    public Rectangle(int X, int Y, int color, String text, int textSize){
+        super(X, Y, 100, 100, BlockType.RECT, color, text, textSize);
         linkedInBlocks = new ArrayList<>();// блоки, лінки яких входять в даний блок
         linkedOutBlocks = new HashMap<Integer, Block>();
     }
 
-    public Rectangle(int X, int Y, int color, String text, int textSize){
-        super(X, Y, 100, 100, BlockType.RECT, color, text, textSize);
+    public Rectangle(int X, int Y, int color, String text, int textSize, int id){
+        super(X, Y, 100, 100, BlockType.RECT, color, text, textSize, id);
         linkedInBlocks = new ArrayList<>();// блоки, лінки яких входять в даний блок
         linkedOutBlocks = new HashMap<Integer, Block>();
     }

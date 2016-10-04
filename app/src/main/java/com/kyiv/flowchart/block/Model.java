@@ -34,6 +34,13 @@ public class Model {
         }
     }
 
+    public Block getBlockById(int id){
+        for (Block block : blockList)
+            if (block.getId() == id)
+                return block;
+        return null;
+    }
+
     public void removeBlockAndLinks(Block block){
         Iterator iterator = linkList.iterator();
         while(iterator.hasNext()){
