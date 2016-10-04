@@ -26,15 +26,25 @@ public class Model {
     }
 
     public void addLink(Link link){
-        linkList.add(link);
+        Block outBlock = link.getOutBlock();//блок, з якого виходить link
+        Block inBlock = link.getInBlock();  //блок, в який входить link
+        if (outBlock.setLinkedOutBlock(link.getOutIndex(), inBlock)) {
+            linkList.add(link);
+            inBlock.setLinkedInBlock(outBlock);
+        }
     }
 
     public void removeBlockAndLinks(Block block){
         Iterator iterator = linkList.iterator();
         while(iterator.hasNext()){
             Link link = (Link) iterator.next();
-            if (link.getInBlock() == block | link.getOutBlock() == block)
+            if (link.getInBlock() == block | link.getOutBlock() == block) {
+                if (link.getInBlock() == block)
+                    link.getOutBlock().removeLinkedBlock(block);
+                else
+                    link.getInBlock().removeLinkedBlock(block);
                 iterator.remove();
+            }
         }
         blockList.remove(block);
     }

@@ -39,11 +39,11 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback, Vie
     private String[] listOutPoints;
     private Model model;
 
-    public DrawView(Context context) {
+    public DrawView(Context context, Model model) {
         super(context);
         this.context = context;
         getHolder().addCallback(this);
-        model = new Model();
+        this.model = model;
         setOnTouchListener(this);
     }
 

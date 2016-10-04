@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,21 +14,16 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.kyiv.flowchart.block.Rectangle;
-import com.kyiv.flowchart.block.Rhomb;
-import com.kyiv.flowchart.block.RoundRect;
+import com.kyiv.flowchart.block.Model;
 import com.kyiv.flowchart.draw.DrawView;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StreamCorruptedException;
 
-import static android.provider.Telephony.Mms.Part.FILENAME;
+import javax.xml.transform.TransformerException;
 
 public class MainActivity extends Activity {
 
@@ -43,12 +37,14 @@ public class MainActivity extends Activity {
     private String[] listOutPoints;
     private boolean isSaved = false;
     private String fileName;
+    private Model model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frame);
-        drawView = new DrawView(this);
+        model = new Model();
+        drawView = new DrawView(this, model);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         frameLayout.addView(drawView, layoutParams);
     }
@@ -79,9 +75,6 @@ public class MainActivity extends Activity {
     }
 
     public void open(View view){
-        /*Intent filePickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        filePickerIntent.setType("file/*");
-        startActivityForResult(filePickerIntent, 1);*/
         Intent intent = new Intent(this, OpenFileActivity.class);
         startActivity(intent);
     }
@@ -90,15 +83,12 @@ public class MainActivity extends Activity {
         showDialog(DIALOG_SAVE_FILE);
     }
 
-    void writeFile(String fileName) {
+    void writeFile(String fileName){
+        ModelToXML modelToXML = new ModelToXML(model);
         try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(fileName, MODE_WORLD_WRITEABLE)));
-            // пишем данные
-            bw.write("Содержимое файла");
-            // закрываем поток
-            bw.close();
+            modelToXML.writeXML(fileName);
+        } catch (TransformerException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,7 +139,7 @@ public class MainActivity extends Activity {
                 adb.setPositiveButton("Зберегти", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        writeFile(etFileName.getText().toString());
+                        writeFile(getFilesDir()+"/" + etFileName.getText().toString());
                         readFile(etFileName.getText().toString());
                     }
                 });

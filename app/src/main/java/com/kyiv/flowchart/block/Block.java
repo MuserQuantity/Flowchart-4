@@ -1,5 +1,8 @@
 package com.kyiv.flowchart.block;
 
+import java.util.HashMap;
+import java.util.List;
+
 public abstract class Block {
     private int width;
     private int height;
@@ -9,6 +12,8 @@ public abstract class Block {
     private int color;
     private String text;
     private int textSize;
+    private static int lastId = -1;
+    private int id;
 
     Block(int X, int Y, int width, int height, BlockType blockType, int color, String text, int textSize){
         this.X = X;
@@ -19,6 +24,12 @@ public abstract class Block {
         this.color = color;
         this.text = text;
         this.textSize = textSize;
+        lastId++;
+        id = lastId;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public int getTextSize(){
@@ -32,9 +43,21 @@ public abstract class Block {
     public abstract Point getInPoint();
     public abstract Point getOutPoint(int i);
     public abstract int getNumberOfOutPoint();
-
+    public abstract boolean setLinkedInBlock(Block block);
+    public abstract boolean setLinkedOutBlock(int i, Block block);
+    public abstract void removeLinkedBlock(Block block);
     public BlockType getBlockType(){
         return blockType;
+    }
+    protected List<Block> linkedInBlocks;
+    protected HashMap<Integer, Block> linkedOutBlocks;
+
+    public List<Block> getLinkedInBlocks(){
+        return linkedInBlocks;
+    }
+
+    public HashMap<Integer, Block> getLinkedOutBlocks(){
+        return linkedOutBlocks;
     }
 
     public int getColor(){
