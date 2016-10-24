@@ -53,6 +53,23 @@
                 android:orientation="vertical"
                 android:layout_below="@id/etText"
                 android:layout_toEndOf="@+id/tvTextSize" />
+
+            <TextView
+                android:text="@string/name_node"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/nameNode"
+                android:textSize="25sp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/numberPicker" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/nameNode"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/etTextNameNode" />
         </RelativeLayout>
     </ScrollView>
     <Button

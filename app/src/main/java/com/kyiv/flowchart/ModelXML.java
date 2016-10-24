@@ -3,6 +3,7 @@ package com.kyiv.flowchart;
 import android.content.Context;
 
 import com.kyiv.flowchart.block.Block;
+import com.kyiv.flowchart.block.BlockType;
 import com.kyiv.flowchart.block.Link;
 import com.kyiv.flowchart.block.Model;
 import com.kyiv.flowchart.block.Rectangle;
@@ -36,6 +37,7 @@ class ModelXML {
     private static final String LINKED_OUT_WITH = "linked_out_with";
     private static final String LINKED_IN_WITH = "linked_in_with";
     private static final String INDEX_OUT = "index_out";
+    private static final String NODE_NAME = "node_name";
     private Context context;
 
     ModelXML(Context context){
@@ -75,6 +77,12 @@ class ModelXML {
         Element blockTextSize = doc.createElement(TEXT_SIZE);
         blockTextSize.appendChild(doc.createTextNode(block.getTextSize() + ""));
         eBlock.appendChild(blockTextSize);
+
+        if (block.getBlockType() != BlockType.RHOMB) {
+            Element blockNodeName = doc.createElement(NODE_NAME);
+            blockNodeName.appendChild(doc.createTextNode(block.getNameNode() + ""));
+            eBlock.appendChild(blockNodeName);
+        }
 
         HashMap<Integer, Block> blocksOut = block.getLinkedOutBlocks();
         if (blocksOut != null && blocksOut.size() != 0) {
@@ -162,12 +170,16 @@ class ModelXML {
             switch(getCharacterDataFromElement((Element) type.item(0))){
                 case "RECT":
                     block = new Rectangle(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
+                    NodeList nodeNameR = element.getElementsByTagName(NODE_NAME);
+                    block.setNameNode(getCharacterDataFromElement((Element)nodeNameR.item(0)));
                     break;
                 case "RHOMB":
                     block = new Rhomb(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
                     break;
                 case "ROUNDRECT":
                     block = new RoundRect(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
+                    NodeList nodeNameRR = element.getElementsByTagName(NODE_NAME);
+                    block.setNameNode(getCharacterDataFromElement((Element)nodeNameRR.item(0)));
                     break;
             }
 
@@ -191,7 +203,7 @@ class ModelXML {
                     int outIndex = Integer.parseInt(out.getAttribute(INDEX_OUT));
                     int linkegWithId = Integer.parseInt(getCharacterDataFromElement(out));
                     Block inBlock = model.getBlockById(linkegWithId);
-                    Link link = new Link();
+                    Link link = new Link(context.getResources().getColor(R.color.block_color));
                     link.setOutIndex(outIndex);
                     link.setInBlock(inBlock);
                     link.setOutBlock(block);

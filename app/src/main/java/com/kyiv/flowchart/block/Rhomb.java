@@ -1,11 +1,19 @@
 package com.kyiv.flowchart.block;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
-public class Rhomb extends Block {
+public class Rhomb extends Block implements Serializable{
     private int numberOfOutPoints = 2;
+    private List<Block> linkedInBlocks;
+    private HashMap<Integer, Block> linkedOutBlocks;
 
     public Rhomb(int X, int Y, int color, String text, int textSize) {
         super(X, Y, 100, 100, BlockType.RHOMB, color, text, textSize);
@@ -68,5 +76,42 @@ public class Rhomb extends Block {
             if (b == block)
                 iter.remove();
         }
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        Paint p = new Paint();
+        p.setColor(getColor());
+        canvas.rotate(45, getX(), getY());
+        canvas.drawRect(getX() - getWidth()/2, getY() - getHeight()/2, getX() + getWidth()/2, getY() + getHeight()/2, p);
+        canvas.rotate(-45, getX(), getY());
+        Point outPoint0 = getOutPoint(0);
+        Point outPoint1 = getOutPoint(1);
+        p.setColor(Color.rgb(218, 124, 23));
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(20);
+        canvas.drawText("0", outPoint0.getX(), outPoint0.getY(), p);
+        canvas.drawText("1", outPoint1.getX(), outPoint1.getY(), p);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(getTextSize());
+        canvas.drawText(getText(), getX(), getY(), p);
+    }
+
+    @Override
+    public void setNameNode(String nameNode) {
+        throw new RuntimeException("Ромб не може бути вузлом графа!");
+    }
+
+    public List<Block> getLinkedInBlocks(){
+        return linkedInBlocks;
+    }
+
+    public HashMap<Integer, Block> getLinkedOutBlocks(){
+        return linkedOutBlocks;
+    }
+
+    @Override
+    public String getNameNode() {
+        return null;
     }
 }

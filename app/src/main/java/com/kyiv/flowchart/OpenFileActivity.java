@@ -1,9 +1,9 @@
 package com.kyiv.flowchart;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OpenFileActivity extends Activity {
+public class OpenFileActivity extends AppCompatActivity {
     ListView list_dir;
     ListView list_files;
     TextView textPath;
@@ -43,12 +43,10 @@ public class OpenFileActivity extends Activity {
         adapterFiles = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayFiles);
         list_files.setAdapter(adapterFiles);
 
-        update_list_dir();
-
         list_dir.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 select_id_list = (int) id;
-                update_list_dir();
+                update_lists();
             }
         });
         list_files.setOnItemClickListener(new OnItemClickListener() {
@@ -56,43 +54,42 @@ public class OpenFileActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
                 intent.putExtra("url", path + "/" + ArrayFiles.get((int)id));
-                setResult(Activity.RESULT_OK, intent);
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });
-
+        update_lists();
     }
 
     public void onClickBack(View view) {
         path = (new File(path)).getParent() + "/";
-        update_list_dir();
+        update_lists();
     }
 
-    public void onClickGo(View view) {
-        Intent intent = new Intent();
-        intent.putExtra("url", path);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
-    }
+    private void update_lists() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (select_id_list != -1) path = path + ArrayDir.get(select_id_list) + "/";
+                select_id_list = -1;
+                ArrayDir.clear();
+                ArrayFiles.clear();
+                File[] files = new File(path).listFiles();
+                if (files != null) {
+                    for (File aFile : files) {
+                        if (aFile.isDirectory())
+                            ArrayDir.add(aFile.getName());
+                        else if (aFile.isFile())
+                            ArrayFiles.add(aFile.getName());
+                    }
+                }
 
-    private void update_list_dir() {
-        if (select_id_list != -1) path = path + ArrayDir.get(select_id_list) + "/";
-        select_id_list = -1;
-        ArrayDir.clear();
-        ArrayFiles.clear();
-        File[] files = new File(path).listFiles();
-        if (files != null) {
-            for (File aFile : files) {
-                if (aFile.isDirectory())
-                    ArrayDir.add(aFile.getName());
-                else if (aFile.isFile())
-                    ArrayFiles.add(aFile.getName());
+                adapterDir.notifyDataSetChanged();
+                adapterFiles.notifyDataSetChanged();
+                textPath.setText(path);
             }
-        }
-
-        adapterDir.notifyDataSetChanged();
-        adapterFiles.notifyDataSetChanged();
-        textPath.setText(path);
+        });
+        thread.start();
     }
 
 

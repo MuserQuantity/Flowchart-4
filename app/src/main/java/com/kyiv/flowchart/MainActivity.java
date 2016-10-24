@@ -3,6 +3,7 @@ package com.kyiv.flowchart;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,11 +13,14 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.kyiv.flowchart.block.Model;
-import com.kyiv.flowchart.draw.DrawView;
+import com.kyiv.flowchart.draw.DrawFlowchart;
 
 import org.xml.sax.SAXException;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,11 +35,12 @@ public class MainActivity extends Activity {
     }
     public final static int DIALOG_OUT_POINT = 1;
     public final static int DIALOG_SAVE_FILE = 2;
+    public final static int EDIT_BLOCK = 3;
     public static Action ACTION = Action.MOVE;
-    private DrawView drawView;
+    private DrawFlowchart drawFlowchart;
     private String[] listOutPoints;
-    private boolean isSaved = false;
     private String fileName;
+    private String filePath;
     private static final int OPENFILE = 1;
     private Model model;
     @Override
@@ -44,39 +49,66 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frame);
         model = new Model();
-        drawView = new DrawView(this, model);
+        drawFlowchart = new DrawFlowchart(this, model);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        frameLayout.addView(drawView, layoutParams);
+        frameLayout.addView(drawFlowchart, layoutParams);
     }
 
-    public void addRect(View view){
-        ACTION = Action.ADDRECT;
-    }
-
-    public void addRoundRect(View view){
-        ACTION = Action.ADDROUNDRECT;
-    }
-
-    public void addRhomb(View view){
-        ACTION = Action.ADDRHOMB;
-    }
-
-    public void editBlock(View view){
-        ACTION = Action.EDIT;
-    }
-
-    public void deleteBlock(View view){
-        ACTION = Action.DELETE;
-    }
-
-    public void addLink(View view){
-        drawView.showHint("Виберіть елемент 1");
-        ACTION = Action.ADDLINK;
-    }
-
-    public void open(View view){
-        Intent intent = new Intent(this, OpenFileActivity.class);
-        startActivityForResult(intent, OPENFILE);
+    public void onClick(View view){
+        switch(view.getId()){
+            case R.id.newButton:
+                if(checkSaved())
+                    close();
+                break;
+            case R.id.openButton:
+                if(checkSaved()) {
+                    Intent intent = new Intent(this, OpenFileActivity.class);
+                    startActivityForResult(intent, OPENFILE);
+                }
+                break;
+            case R.id.saveButton:
+                if (fileName == null | filePath == null)
+                    showDialog(DIALOG_SAVE_FILE);
+                else {
+                    writeFile(filePath + "/" + fileName);
+                    model.changeWasSaved();
+                }
+                break;
+            case R.id.graphButton:
+                if(!model.findWarnings()) {
+                    Intent intent = new Intent(this, GraphActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("model", model);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+                else
+                    Toast.makeText(this, "В блок-схемі виявлені помилки. Виправте їх спочатку", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.closeButton:
+                if(checkSaved())
+                    close();
+                break;
+            case R.id.rectButton:
+                ACTION = Action.ADDRECT;
+                break;
+            case R.id.roundrectButton:
+                ACTION = Action.ADDROUNDRECT;
+                break;
+            case R.id.rhombButton:
+                ACTION = Action.ADDRHOMB;
+                break;
+            case R.id.deleteButton:
+                ACTION = Action.DELETE;
+                break;
+            case R.id.editButton:
+                ACTION = Action.EDIT;
+                break;
+            case R.id.linkButton:
+                drawFlowchart.showHint("Виберіть елемент 1");
+                ACTION = Action.ADDLINK;
+                break;
+        }
     }
 
     @Override
@@ -84,25 +116,26 @@ public class MainActivity extends Activity {
         switch (requestCode){
             case OPENFILE:
                 if (resultCode == RESULT_OK){
-                    fileName = intent.getStringExtra("url");
-                    readFile(fileName);
+                    close();
+                    String url = intent.getStringExtra("url");
+                    readFile(this, url);
+                }
+                break;
+            case EDIT_BLOCK:
+                if (resultCode == RESULT_OK){
+                    drawFlowchart.saveChangeEditBlock(intent.getStringExtra("text"), intent.getIntExtra("text_size", 20), intent.getStringExtra("nameNode"));
                 }
                 break;
         }
-    }
-
-    public void save(View view){
-        showDialog(DIALOG_SAVE_FILE);
     }
 
     void writeFile(String fileName){
         ModelXML modelToXML = new ModelXML(this);
         try {
             modelToXML.writeXML(model, fileName);
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            Toast.makeText(this, "Файл " + (new File(fileName)).getName() + " успішно збережено", Toast.LENGTH_SHORT).show();
+        } catch (TransformerException | IOException e) {
+            Toast.makeText(this, "Помилка запису до файлу " + (new File(fileName)).getName(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -116,10 +149,10 @@ public class MainActivity extends Activity {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     ListView lv = ((AlertDialog) dialog).getListView();
-                    drawView.setLinkOutIndex(lv.getCheckedItemPosition());
+                    drawFlowchart.setLinkOutIndex(lv.getCheckedItemPosition());
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
-                    drawView.deleteNewLink();
+                    drawFlowchart.deleteNewLink();
                     break;
             }
         }
@@ -151,7 +184,11 @@ public class MainActivity extends Activity {
                 adb.setPositiveButton("Зберегти", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        writeFile(getFilesDir()+"/" + etFileName.getText().toString());
+                        if (filePath == null || fileName == null)
+                            writeFile(getFilesDir() + "/" + etFileName.getText().toString());
+                        else
+                            writeFile(filePath + "/" + etFileName.getText().toString());
+                        model.changeWasSaved();
                     }
                 });
                 adb.setNegativeButton("Не зберігати", null);
@@ -160,19 +197,40 @@ public class MainActivity extends Activity {
         return adb.create();
     }
 
-    void readFile(String fileName) {
-        ModelXML modelXML = new ModelXML(this);
-        try {
-            model = modelXML.readXML(new FileInputStream(fileName));
-            drawView.setModel(model);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void readFileInNewThread(final Context context, final String fileName){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                    ModelXML modelXML = new ModelXML(context);
+                try {
+                    model = modelXML.readXML(new FileInputStream(fileName));
+                    model.changeWasSaved();
+                    drawFlowchart.setModel(model);
+                } catch (ParserConfigurationException | SAXException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    boolean readFile(Context context, String fileName) {
+        readFileInNewThread(context, fileName);
+
+        return false;
+    }
+
+    public void close(){
+        model = new Model();
+        drawFlowchart.setModel(model);
+        fileName = null;
+        filePath = null;
+    }
+
+    public boolean checkSaved(){
+        if(!model.isChanged())
+            return true;
+        showDialog(DIALOG_SAVE_FILE);
+        return false;
     }
 }

@@ -1,11 +1,20 @@
 package com.kyiv.flowchart.block;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
-public class RoundRect extends Block{
+public class RoundRect extends Block implements Serializable{
     private int numberOfOutPoints = 1;
+    private List<Block> linkedInBlocks;
+    private HashMap<Integer, Block> linkedOutBlocks;
 
     public RoundRect(int X, int Y, int color, String text, int textSize){
         super(X, Y, 100, 50, BlockType.ROUNDRECT, color, text, textSize);
@@ -61,5 +70,35 @@ public class RoundRect extends Block{
             if (b == block)
                 iter.remove();
         }
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        Paint p = new Paint();
+        p.setColor(getColor());
+        RectF rectF = new RectF(getX()-getWidth()/2, getY() - getHeight()/2, getX() + getWidth()/2, getY() + getHeight()/2);
+        canvas.drawRoundRect(rectF, 10, 10, p);
+
+        p.setColor(Color.BLACK);
+        canvas.drawCircle(getX() - getWidth()/2, getY(), 10, p);
+
+        p.setColor(Color.rgb(218, 124, 23));
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(getTextSize());
+        canvas.drawText(getText(), getX(), getY(), p);
+        canvas.drawText(getNameNode(), getX() - getWidth()/2-30, getY(), p);
+    }
+
+    @Override
+    public void setNameNode(String nameNode) {
+        this.nameNode = nameNode;
+    }
+
+    public List<Block> getLinkedInBlocks(){
+        return linkedInBlocks;
+    }
+
+    public HashMap<Integer, Block> getLinkedOutBlocks(){
+        return linkedOutBlocks;
     }
 }

@@ -16,7 +16,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/frame"
+        android:id="@+id/frameGraph"
 
         android:layout_alignParentStart="true"
         android:layout_above="@+id/scrollViewBottom">
@@ -39,14 +39,6 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/ic_file"
-                android:id="@+id/newButton"
-                android:layout_weight="1"
-                android:onClick="onClick"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:src="@mipmap/ic_folder"
                 android:id="@+id/openButton"
                 android:layout_weight="1"
@@ -63,41 +55,9 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/graph"
-                android:id="@+id/graphButton"
-                android:layout_weight="1"
-                android:onClick="onClick"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:src="@mipmap/ic_close_box_outline"
                 android:id="@+id/closeButton"
                 android:layout_weight="1"
-                android:onClick="onClick"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rectButton"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_rectangle"
-                android:onClick="onClick"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/roundrectButton"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_roundrect"
-                android:onClick="onClick"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rhombButton"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_rhomb"
                 android:onClick="onClick"/>
 
             <ImageButton
