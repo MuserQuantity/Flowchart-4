@@ -39,11 +39,7 @@ public class DrawGraph extends DrawView implements SurfaceHolder.Callback, View.
 
         List<Node> nodeList = graphModel.getNodeList();
 
-        for (int index = 0; index < nodeList.size(); index++) {
-            Node node = nodeList.get(index);
-
-            node.drawLinks(canvas);
-        }
+        graphModel.drawLinks(canvas);
 
         for (int index = 0; index < nodeList.size(); index++) {
             Node node = nodeList.get(index);

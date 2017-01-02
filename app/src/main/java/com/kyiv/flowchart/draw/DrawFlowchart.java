@@ -319,9 +319,9 @@ public class DrawFlowchart extends DrawView implements SurfaceHolder.Callback, V
             intent.putExtra("text", block.getText());
             intent.putExtra("text_size", block.getTextSize());
             intent.putExtra("blockType", block.getBlockType().toString());
-            String nameNode = block.getNameNode();
-            if (nameNode != null){
-                intent.putExtra("nameNode", nameNode);
+            int numberNode = block.getNumberNode();
+            if (numberNode != -1){
+                intent.putExtra("numberNode", numberNode);
             }
             ((MainActivity)getContext()).startActivityForResult(intent, MainActivity.EDIT_BLOCK);
 
@@ -330,12 +330,12 @@ public class DrawFlowchart extends DrawView implements SurfaceHolder.Callback, V
         }
     }
 
-    public void saveChangeEditBlock(String text, int textSize, String nameNode){
+    public void saveChangeEditBlock(String text, int textSize, int numberNode){
         if (editBlock != null){
             editBlock.setText(text);
             editBlock.setTextSize(textSize);
             if (editBlock.getBlockType() != BlockType.RHOMB)
-                editBlock.setNameNode(nameNode);
+                editBlock.setNumberNode(numberNode);
         }
     }
 

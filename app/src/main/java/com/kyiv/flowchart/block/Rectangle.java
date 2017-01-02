@@ -85,12 +85,12 @@ public class Rectangle extends Block implements Serializable{
         p.setTextSize(getTextSize());
         canvas.drawText(getText(), getX(), getY(), p);
 
-        canvas.drawText(getNameNode(), getX() - getWidth()/2-30, getY(), p);
+        canvas.drawText("Z" + getNumberNode(), getX() - getWidth()/2-30, getY(), p);
     }
 
     @Override
-    public void setNameNode(String nameNode) {
-        this.nameNode = nameNode;
+    public void setNumberNode(int numberNode) {
+        this.numberNode = numberNode;
     }
 
     public List<Block> getLinkedInBlocks(){

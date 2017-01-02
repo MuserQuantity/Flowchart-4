@@ -63,6 +63,7 @@ public class MainActivity extends Activity {
             case R.id.openButton:
                 if(checkSaved()) {
                     Intent intent = new Intent(this, OpenFileActivity.class);
+                    intent.putExtra("nameFilter", ".flowchart");
                     startActivityForResult(intent, OPENFILE);
                 }
                 break;
@@ -117,13 +118,13 @@ public class MainActivity extends Activity {
             case OPENFILE:
                 if (resultCode == RESULT_OK){
                     close();
-                    String url = intent.getStringExtra("url");
-                    readFile(this, url);
+                    String filePath = intent.getStringExtra("filePath");
+                    readFile(this, filePath);
                 }
                 break;
             case EDIT_BLOCK:
                 if (resultCode == RESULT_OK){
-                    drawFlowchart.saveChangeEditBlock(intent.getStringExtra("text"), intent.getIntExtra("text_size", 20), intent.getStringExtra("nameNode"));
+                    drawFlowchart.saveChangeEditBlock(intent.getStringExtra("text"), intent.getIntExtra("text_size", 20), intent.getIntExtra("numberNode", -1));
                 }
                 break;
         }
@@ -158,6 +159,10 @@ public class MainActivity extends Activity {
         }
     };
 
+    public void showMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     protected Dialog onCreateDialog(int id) {
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         switch (id) {
@@ -184,11 +189,17 @@ public class MainActivity extends Activity {
                 adb.setPositiveButton("Зберегти", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (filePath == null || fileName == null)
-                            writeFile(getFilesDir() + "/" + etFileName.getText().toString());
-                        else
-                            writeFile(filePath + "/" + etFileName.getText().toString());
-                        model.changeWasSaved();
+                        fileName = etFileName.getText().toString();
+                        if (!fileName.equals("")){
+                            if (!fileName.contains("."))
+                                fileName += ".flowchart";
+                            filePath = getFilesDir().getPath();
+                            writeFile(filePath + "/" + fileName);
+                            model.changeWasSaved();
+                        }
+                        else{
+                            showMessage("Зміни не було збережено");
+                        }
                     }
                 });
                 adb.setNegativeButton("Не зберігати", null);

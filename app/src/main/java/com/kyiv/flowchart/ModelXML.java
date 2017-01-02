@@ -80,7 +80,7 @@ class ModelXML {
 
         if (block.getBlockType() != BlockType.RHOMB) {
             Element blockNodeName = doc.createElement(NODE_NAME);
-            blockNodeName.appendChild(doc.createTextNode(block.getNameNode() + ""));
+            blockNodeName.appendChild(doc.createTextNode(block.getNumberNode() + ""));
             eBlock.appendChild(blockNodeName);
         }
 
@@ -171,7 +171,7 @@ class ModelXML {
                 case "RECT":
                     block = new Rectangle(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
                     NodeList nodeNameR = element.getElementsByTagName(NODE_NAME);
-                    block.setNameNode(getCharacterDataFromElement((Element)nodeNameR.item(0)));
+                    block.setNumberNode(Integer.parseInt(getCharacterDataFromElement((Element)nodeNameR.item(0))));
                     break;
                 case "RHOMB":
                     block = new Rhomb(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
@@ -179,7 +179,7 @@ class ModelXML {
                 case "ROUNDRECT":
                     block = new RoundRect(x, y, context.getResources().getColor(R.color.block_color), text, textSize, id);
                     NodeList nodeNameRR = element.getElementsByTagName(NODE_NAME);
-                    block.setNameNode(getCharacterDataFromElement((Element)nodeNameRR.item(0)));
+                    block.setNumberNode(Integer.parseInt(getCharacterDataFromElement((Element)nodeNameRR.item(0))));
                     break;
             }
 

@@ -98,7 +98,7 @@ public class Rhomb extends Block implements Serializable{
     }
 
     @Override
-    public void setNameNode(String nameNode) {
+    public void setNumberNode(int numberNode) {
         throw new RuntimeException("Ромб не може бути вузлом графа!");
     }
 
@@ -111,7 +111,7 @@ public class Rhomb extends Block implements Serializable{
     }
 
     @Override
-    public String getNameNode() {
-        return null;
+    public int getNumberNode() {
+        return -1;
     }
 }

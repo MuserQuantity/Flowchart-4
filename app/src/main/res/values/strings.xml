@@ -3,5 +3,5 @@
     <string name="text">Текст</string>
     <string name="textSize">Розмір тексту</string>
     <string name="save">Зберегти</string>
-    <string name="name_node">Назва вузла</string>
+    <string name="number_node">Номер вузла</string>
 </resources>

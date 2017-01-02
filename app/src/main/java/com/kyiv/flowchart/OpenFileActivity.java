@@ -27,11 +27,15 @@ public class OpenFileActivity extends AppCompatActivity {
     List<String> ArrayFiles = new ArrayList<>();
     ArrayAdapter<String> adapterDir;
     ArrayAdapter<String> adapterFiles;
+    String nameFilter = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         _context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.open_file_layout);
+        Intent intent = getIntent();
+
+        nameFilter = intent.getStringExtra("nameFilter");
         path = getFilesDir().getAbsolutePath();
 
         list_dir = (ListView) findViewById(R.id.list_dir);
@@ -53,7 +57,7 @@ public class OpenFileActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
-                intent.putExtra("url", path + "/" + ArrayFiles.get((int)id));
+                intent.putExtra("filePath", path + "/" + ArrayFiles.get((int)id));
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -79,8 +83,11 @@ public class OpenFileActivity extends AppCompatActivity {
                     for (File aFile : files) {
                         if (aFile.isDirectory())
                             ArrayDir.add(aFile.getName());
-                        else if (aFile.isFile())
-                            ArrayFiles.add(aFile.getName());
+                        else if (aFile.isFile()) {
+                            String name = aFile.getName();
+                            if (name.contains(nameFilter))
+                                ArrayFiles.add(aFile.getName());
+                        }
                     }
                 }
 

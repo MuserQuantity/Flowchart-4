@@ -69,43 +69,89 @@ public class LinkGraph implements Serializable{
         return result;
     }
 
+    public List<Point> getCircleIntersections(Point circle1, int radius1, Point circle2, int radius2){
+        double distance = Math.sqrt((circle1.getX() - circle2.getX())*(circle1.getX() - circle2.getX()) + (circle1.getY() - circle2.getY())*(circle1.getY() - circle2.getY()));
+        if (distance > radius1 + radius2)
+            return null;
+        List<Point> points = new ArrayList<>();
+        Point point = new Point((circle1.getX() + circle2.getX())/2, (circle1.getY() + circle2.getY())/2);
+        if (distance == radius1 + radius2) {
+            points.add(point);
+            return points;
+        }
+        float a = (circle1.getY() - circle2.getY()) / (circle1.getX() - circle2.getX());
+        a = -1/a;
+        float b = point.getY() - a*point.getX();
+        return getCircleLineIntersection(circle1, radius1, a, b);
+
+    }
+
     private void drawLinkAndArrow(Canvas canvas, Point outPoint, Point inPoint){
 
-        //y = a*x + b
-        float a = (outPoint.getY() - inPoint.getY())/(outPoint.getX() - inPoint.getX());
-        float b = (inPoint.getY()*outPoint.getX() - inPoint.getX()*outPoint.getY())/(outPoint.getX() - inPoint.getX()) + mudslide;
-        List<Point> points = getCircleLineIntersection(inPoint, Node.getRadius(), a, b);
-        if(points.size() != 0) {
-            double length = Double.MAX_VALUE;
-            Point resPoint = null;
-            for (Point point : points) {
-                double distance = getDistance(inPoint, point);
-                double l = Math.sqrt((outPoint.getX() - point.getX()) * (outPoint.getX() - point.getX()) + (outPoint.getY() - point.getY()) * (outPoint.getY() - point.getY()));
-                if (l < length) {
-                    length = l;
-                    resPoint = point;
-                }
+        if (outPoint.equals(inPoint)){
+            float a = -1;
+            float b = outPoint.getY() - a * outPoint.getX();
+            List<Point> pointList = getCircleLineIntersection(outPoint, Node.getRadius(), a, b);
+            Point point = null;
+            for(Point p : pointList){
+                if (p.getY() < inPoint.getY())
+                    point = p;
             }
+            List points = getCircleIntersections(outPoint, Node.getRadius(), point, Node.getRadius());
             Paint paint = new Paint();
             paint.setColor(getColor());
-            outPoint.setY(outPoint.getY() + mudslide);
-            canvas.drawLine(outPoint.getX(), outPoint.getY(), resPoint.getX(), resPoint.getY(), paint);
-            points = getCircleLineIntersection(resPoint, Node.getRadius(), a, b);
-            Point arrowPoint = null;
-            for (Point point : points){
-                if ((point.getX() >= outPoint.getX() & point.getX() <= resPoint.getX()) | (point.getX() >= resPoint.getX() & point.getX() <= outPoint.getX()))
-                    if((point.getY() >= outPoint.getY() & point.getY() <= resPoint.getY()) | (point.getY() >= resPoint.getY() & point.getY() <= outPoint.getY()))
-                        arrowPoint = point;
+            paint.setStyle(Paint.Style.STROKE);
+            canvas.drawCircle(point.getX(), point.getY(), Node.getRadius(), paint);
+
+        }
+        else {
+            //y = a*x + b
+            float a = (outPoint.getY() - inPoint.getY()) / (outPoint.getX() - inPoint.getX());
+            float b = (inPoint.getY() * outPoint.getX() - inPoint.getX() * outPoint.getY()) / (outPoint.getX() - inPoint.getX()) + mudslide;
+            List<Point> points = getCircleLineIntersection(inPoint, Node.getRadius(), a, b);
+            if (points.size() != 0) {
+                double length = Double.MAX_VALUE;
+                Point resPoint = null;
+                for (Point point : points) {
+                    double l = Math.sqrt((outPoint.getX() - point.getX()) * (outPoint.getX() - point.getX()) + (outPoint.getY() - point.getY()) * (outPoint.getY() - point.getY()));
+                    if (l < length) {
+                        length = l;
+                        resPoint = point;
+                    }
+                }
+                Paint paint = new Paint();
+                paint.setColor(getColor());
+                outPoint.setY(outPoint.getY() + mudslide);
+                canvas.drawLine(outPoint.getX(), outPoint.getY(), resPoint.getX(), resPoint.getY(), paint);
+                points = getCircleLineIntersection(resPoint, Node.getRadius(), a, b);
+                Point arrowPoint = null;
+                for (Point point : points) {
+                    if ((point.getX() >= outPoint.getX() & point.getX() <= resPoint.getX()) | (point.getX() >= resPoint.getX() & point.getX() <= outPoint.getX()))
+                        if ((point.getY() >= outPoint.getY() & point.getY() <= resPoint.getY()) | (point.getY() >= resPoint.getY() & point.getY() <= outPoint.getY()))
+                            arrowPoint = point;
+                }
+                if (arrowPoint != null) {
+                    float A = -1 / a;
+                    float B = arrowPoint.getY() - A * arrowPoint.getX();
+                    points = getCircleLineIntersection(arrowPoint, 10, A, B);
+                    for (Point point : points)
+                        canvas.drawLine(resPoint.getX(), resPoint.getY(), point.getX(), point.getY(), paint);
+                }
             }
-            if(arrowPoint != null) {
-                float A = -1 / a;
-                float B = arrowPoint.getY() - A * arrowPoint.getX();
-                points = getCircleLineIntersection(arrowPoint, 10, A, B);
-                for (Point point : points)
-                    canvas.drawLine(resPoint.getX(), resPoint.getY(), point.getX(), point.getY(), paint);
-            }
+        }
+    }
+
+    public void drawCondtion(Canvas canvas){
+        Point outPoint = getOutPoint();
+        Point inPoint = getInPoint();
+        Paint paint = new Paint();
+        paint.setColor(getColor());
+        paint.setTextSize(20);
+        if (!inPoint.equals(outPoint))
+            canvas.drawText(getCondition(), (outPoint.getX() + inPoint.getX()) / 2, (outPoint.getY() + inPoint.getY()) / 2 + mudslide, paint);
+        else{
             paint.setTextSize(20);
-            canvas.drawText(getCondition(), (outPoint.getX() + resPoint.getX())/2, (outPoint.getY() + resPoint.getY())/2 + mudslide, paint);
+            canvas.drawText(getCondition(), outPoint.getX() + Node.getRadius(), outPoint.getY() - Node.getRadius(), paint);
         }
     }
 
@@ -121,6 +167,7 @@ public class LinkGraph implements Serializable{
         p.setColor(getColor());
 
         drawLinkAndArrow(canvas, outPoint, inPoint);
+        drawCondtion(canvas);
     }
 
     public void setCondition(String condition) {

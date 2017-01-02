@@ -22,7 +22,7 @@ public abstract class Block implements Serializable{
     private boolean isWarning;
     private int radius;
 
-    protected String nameNode = "";
+    protected int numberNode = 0;
 
     public abstract Point getInPoint();
 
@@ -31,7 +31,7 @@ public abstract class Block implements Serializable{
     public abstract boolean setLinkedOutBlock(int i, Block block);
     public abstract void removeLinkedBlock(Block block);
     public abstract void draw(Canvas canvas);
-    public abstract void setNameNode(String nameNode);
+    public abstract void setNumberNode(int numberNode);
     public abstract Point getOutPoint(int i);
     public abstract List<Block> getLinkedInBlocks();
     public abstract HashMap<Integer, Block> getLinkedOutBlocks();
@@ -93,8 +93,8 @@ public abstract class Block implements Serializable{
         lastId = -1;
     }
 
-    public String getNameNode(){
-        return nameNode;
+    public int getNumberNode(){
+        return numberNode;
     }
 
     public void setColor(int color){

@@ -55,7 +55,7 @@
                 android:layout_toEndOf="@+id/tvTextSize" />
 
             <TextView
-                android:text="@string/name_node"
+                android:text="@string/number_node"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/nameNode"
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/nameNode"
-                android:inputType="textPersonName"
+                android:inputType="numberDecimal"
                 android:ems="10"
                 android:id="@+id/etTextNameNode" />
         </RelativeLayout>

@@ -23,8 +23,8 @@ public class EditBlock extends AppCompatActivity{
         editTextNameNode = (EditText) findViewById(R.id.etTextNameNode);
         blockType = intent.getStringExtra("blockType");
         if (!blockType.equals(BlockType.RHOMB.toString())){
-            String nameNode = intent.getStringExtra("nameNode");
-            editTextNameNode.setText(nameNode);
+            int numberNode = intent.getIntExtra("numberNode", -1);
+            editTextNameNode.setText(numberNode+"");
         }
         else {
             editTextNameNode.setEnabled(false);
@@ -44,7 +44,7 @@ public class EditBlock extends AppCompatActivity{
         intent.putExtra("text", editText.getText().toString());
         intent.putExtra("text_size", numberPicker.getValue());
         if (!blockType.equals(BlockType.RHOMB.toString()))
-            intent.putExtra("nameNode", editTextNameNode.getText().toString());
+            intent.putExtra("numberNode", Integer.parseInt(editTextNameNode.getText().toString()));
         setResult(RESULT_OK, intent);
         finish();
     }

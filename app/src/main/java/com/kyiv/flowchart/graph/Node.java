@@ -10,29 +10,38 @@ import com.kyiv.flowchart.block.BlockType;
 import com.kyiv.flowchart.block.Link;
 import com.kyiv.flowchart.block.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Node{
+public class Node implements Serializable{
     private List<Node> linkedOutNodes;
-    private List<LinkGraph> links;
+    private List<Node> linkedInNodes;
     private int X;
     private int Y;
     private static int radius;
     private int color;
-    private String nameNode;
+    private int nodeNumber;
     private String operators;
     private int textSize;
+    private int[] code;
 
-    public Node(int X, int Y, int radius, int color, String nameNode, String operators, int textSize) {
+    public int[] getCode() {
+        return code;
+    }
+
+    public void setCode(int[] code) {
+        this.code = code;
+    }
+    public Node(int X, int Y, int radius, int color, int nodeNumber, String operators, int textSize) {
         this.X = X;
         this.Y = Y;
         linkedOutNodes = new ArrayList<>();
-        links = new ArrayList<>();
-        this.radius = radius;
+        linkedInNodes = new ArrayList<>();
+        Node.radius = radius;
         this.color = color;
-        this.nameNode = nameNode;
+        this.nodeNumber = nodeNumber;
         this.operators = operators;
         this.textSize = textSize;
     }
@@ -40,6 +49,10 @@ public class Node{
     public void setXY(int X, int Y){
         this.X = X;
         this.Y = Y;
+    }
+
+    public void removeOutNode(Node node){
+        linkedOutNodes.remove(node);
     }
 
     public void setX(int x) {
@@ -51,7 +64,7 @@ public class Node{
     }
 
     public void setRadius(int radius) {
-        this.radius = radius;
+        Node.radius = radius;
     }
 
     public void setTextSize(int textSize) {
@@ -74,32 +87,16 @@ public class Node{
         return new Point(getX(), getY());
     }
 
+    public void addLinkedOutNode(Node node) {
+        linkedOutNodes.add(node);
+    }
+
+    public void addLinkedInNode(Node node) {
+        linkedInNodes.add(node);
+    }
+
     public List<Node> getLinkedOutNodes() {
         return linkedOutNodes;
-    }
-
-    public LinkGraph getLinkWith(Node node){
-        for (LinkGraph link : links)
-            if (link.getInNode() == node)
-                return link;
-        return null;
-    }
-
-    public boolean setLinkedOutNode(String condition, Node node) {
-        Log.d("graphCondition", this.getNameNode() + "->" + node.getNameNode() + " = " + condition);
-        linkedOutNodes.add(node);
-        LinkGraph newLink = new LinkGraph(condition);
-        LinkGraph l;
-        if((l = node.getLinkWith(this)) != null){
-            l.setMudslide(-10);
-            l.setColor(Color.RED);
-            newLink.setMudslide(+10);
-        }
-        newLink.setInNode(node);
-        newLink.setOutNode(this);
-        links.add(newLink);
-
-        return true;
     }
 
     public int getColor(){
@@ -111,16 +108,11 @@ public class Node{
     }
 
     public String getNameNode(){
-        return nameNode;
+        return "Z" + nodeNumber;
     }
 
     public String getOperators(){
         return operators;
-    }
-
-    public void drawLinks(Canvas canvas){
-        for(LinkGraph link : links)
-            link.draw(canvas);
     }
 
     public void drawNode(Canvas canvas) {
@@ -134,6 +126,10 @@ public class Node{
         p.setTextSize(getTextSize());
         canvas.drawText(getNameNode(), getX(), getY() - getRadius()/2, p);
         canvas.drawText(getOperators(), getX(), getY() + getRadius()/2, p);
+        String codeStr = "";
+        for (int i = 0; i < code.length; i++)
+            codeStr += code[i];
+        canvas.drawText(codeStr, getX() + getRadius(), getY() - getRadius(), p);
     }
 
 
@@ -145,7 +141,11 @@ public class Node{
         this.color = color;
     }
 
-    public void setNameNode(String nameNode) {
-        this.nameNode = nameNode;
+    public void setNumberNode(int nodeNumber) {
+        this.nodeNumber = nodeNumber;
+    }
+
+    public int getNumberNode(){
+        return nodeNumber;
     }
 }
